@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Firebase App</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: linear-gradient(to right, #4facfe, #00f2fe);
+      text-align: center;
+      margin: 0;
+    }
+
+    .card {
+      background: white;
+      padding: 25px;
+      margin: 100px auto;
+      width: 300px;
+      border-radius: 15px;
+      box-shadow: 0px 5px 20px rgba(0,0,0,0.2);
+    }
+
+    input {
+      width: 90%;
+      padding: 10px;
+      margin: 8px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      padding: 10px;
+      width: 90%;
+      margin: 5px;
+      border: none;
+      border-radius: 8px;
+      background: #4facfe;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #00c6ff;
+    }
+
+    #home {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- LOGIN PAGE -->
+<div class="card" id="login">
+  <h2>🔐 Login</h2>
+  <input type="email" id="email" placeholder="Email"><br>
+  <input type="password" id="password" placeholder="Password"><br>
+
+  <button onclick="signup()">Signup</button>
+  <button onclick="login()">Login</button>
+  <button onclick="googleLogin()">Google Login</button>
+</div>
+
+<!-- HOME PAGE -->
+<div class="card" id="home">
+  <h2>🏠 Home Page</h2>
+  <p id="user"></p>
+
+  <button onclick="logout()">Logout</button>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
+import { 
+  getAuth, 
+  createUserWithEmailAndPassword, 
+  signInWithEmailAndPassword, 
+  GoogleAuthProvider, 
+  signInWithPopup,
+  signOut,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA2lwztDpRpACuXirg7T_WbMLqscnNwCdc",
+  authDomain: "viewclick-bea4e.firebaseapp.com",
+  projectId: "viewclick-bea4e",
+  storageBucket: "viewclick-bea4e.firebasestorage.app",
+  messagingSenderId: "462455920611",
+  appId: "1:462455920611:web:2f4d5d415ad9fa891cb2d6",
+  measurementId: "G-17RYLQNSG7"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+// UI Switch
+function showHome(user){
+  document.getElementById("login").style.display = "none";
+  document.getElementById("home").style.display = "block";
+  document.getElementById("user").innerText = "Welcome: " + user.email;
+}
+
+function showLogin(){
+  document.getElementById("login").style.display = "block";
+  document.getElementById("home").style.display = "none";
+}
+
+// Signup
+window.signup = () => {
+  const email = emailInput();
+  const password = passwordInput();
+
+  createUserWithEmailAndPassword(auth, email, password)
+    .then(res => showHome(res.user))
+    .catch(err => alert(err.message));
+};
+
+// Login
+window.login = () => {
+  const email = emailInput();
+  const password = passwordInput();
+
+  signInWithEmailAndPassword(auth, email, password)
+    .then(res => showHome(res.user))
+    .catch(err => alert(err.message));
+};
+
+// Google Login
+window.googleLogin = () => {
+  const provider = new GoogleAuthProvider();
+  signInWithPopup(auth, provider)
+    .then(res => showHome(res.user))
+    .catch(err => alert(err.message));
+};
+
+// Logout
+window.logout = () => {
+  signOut(auth).then(showLogin);
+};
+
+// Auto login detect
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    showHome(user);
+  } else {
+    showLogin();
+  }
+});
+
+// Helpers
+function emailInput(){
+  return document.getElementById("email").value;
+}
+function passwordInput(){
+  return document.getElementById("password").value;
+}
+
+</script>
+
+</body>
+</html>
