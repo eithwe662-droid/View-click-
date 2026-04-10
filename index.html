@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ViewClick App</title>
+
+<style>
+body {
+  margin:0;
+  font-family:Arial;
+  background: linear-gradient(135deg,#ff416c,#ff4b2b);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+
+.box {
+  background:white;
+  width:320px;
+  padding:20px;
+  border-radius:20px;
+  text-align:center;
+}
+
+input {
+  width:100%;
+  padding:10px;
+  margin:6px 0;
+  border-radius:10px;
+  border:1px solid #ddd;
+}
+
+button {
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border:none;
+  border-radius:10px;
+  background:#ff416c;
+  color:white;
+}
+
+.page { display:none; }
+.active { display:block; }
+</style>
+</head>
+
+<body>
+
+<div class="box">
+
+<!-- LOGIN -->
+<div id="loginPage" class="page active">
+  <h2>Login</h2>
+  <input id="email" placeholder="Email">
+  <input id="pass" type="password" placeholder="Password">
+  <button onclick="login()">Login</button>
+  <p onclick="show('signupPage')" style="color:red;">Create account</p>
+</div>
+
+<!-- SIGNUP -->
+<div id="signupPage" class="page">
+  <h2>Sign Up</h2>
+  <input id="email2" placeholder="Email">
+  <input id="pass2" type="password" placeholder="Password">
+  <button onclick="signup()">Sign Up</button>
+  <p onclick="show('loginPage')" style="color:red;">Back to login</p>
+</div>
+
+<!-- HOME -->
+<div id="homePage" class="page">
+  <h2>🔥 View Click App</h2>
+  <p>💰 Balance: <span id="bal">0</span></p>
+  <p>🎥 Ads: <span id="ads">0</span>/10</p>
+
+  <button onclick="watchAd()">Watch Ad</button>
+  <button onclick="logout()">Logout</button>
+</div>
+
+</div>
+
+<script>
+let users = {};
+let currentUser = null;
+
+let balance = 0;
+let adsCount = 0;
+
+// show page
+function show(id){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+
+// signup
+function signup(){
+  let e = email2.value;
+  let p = pass2.value;
+
+  if(!e || !p) return alert("Fill all");
+
+  users[e] = {password:p, balance:0};
+  alert("Account created");
+  show("loginPage");
+}
+
+// login
+function login(){
+  let e = email.value;
+  let p = pass.value;
+
+  if(users[e] && users[e].password===p){
+    currentUser = e;
+    balance = users[e].balance;
+    show("homePage");
+    update();
+  } else {
+    alert("Wrong login");
+  }
+}
+
+// watch ad
+function watchAd(){
+  adsCount++;
+  alert("Ad watched "+adsCount+"/10");
+
+  if(adsCount>=10){
+    balance += 10;
+    adsCount=0;
+    alert("Reward +10");
+  }
+
+  users[currentUser].balance = balance;
+  update();
+}
+
+// update UI
+function update(){
+  bal.innerText = balance;
+  ads.innerText = adsCount;
+}
+
+// logout
+function logout(){
+  show("loginPage");
+}
+</script>
+
+</body>
+</html>
