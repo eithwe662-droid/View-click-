@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login - Earn App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+      height: 100vh;
+      background: linear-gradient(135deg, #1d2671, #c33764);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .box {
+      width: 90%;
+      max-width: 350px;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(15px);
+      border-radius: 20px;
+      padding: 25px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 10px;
+      border: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 15px;
+      border-radius: 10px;
+      border: none;
+      background: gold;
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    .switch {
+      margin-top: 15px;
+      font-size: 14px;
+      cursor: pointer;
+      opacity: 0.8;
+    }
+
+  </style>
+</head>
+
+<body>
+
+<div class="box">
+  <h2 id="title">Login</h2>
+
+  <input type="email" id="email" placeholder="Email">
+  <input type="password" id="password" placeholder="Password">
+
+  <button onclick="login()">Login</button>
+
+  <div class="switch" onclick="toggle()">Don't have account? Signup</div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+
+// 🔥 Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyA2lwztDpRpACuXirg7T_WbMLqscnNwCdc",
+  authDomain: "viewclick-bea4e.firebaseapp.com",
+  projectId: "viewclick-bea4e",
+  storageBucket: "viewclick-bea4e.firebasestorage.app",
+  messagingSenderId: "462455920611",
+  appId: "1:462455920611:web:f9d55065198faf191cb2d6"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth();
+const db = getFirestore();
+
+let isLogin = true;
+
+// 🔁 Toggle Login / Signup
+window.toggle = function(){
+  isLogin = !isLogin;
+  document.getElementById("title").innerText = isLogin ? "Login" : "Signup";
+  document.querySelector("button").innerText = isLogin ? "Login" : "Signup";
+  document.querySelector(".switch").innerText =
+    isLogin ? "Don't have account? Signup" : "Already have account? Login";
+}
+
+// 🔐 Login / Signup
+window.login = async function(){
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  if(email == "" || password == ""){
+    alert("Fill all fields!");
+    return;
+  }
+
+  try{
+    if(isLogin){
+      await signInWithEmailAndPassword(auth, email, password);
+    } else {
+      const userCred = await createUserWithEmailAndPassword(auth, email, password);
+
+      // create user data
+      await setDoc(doc(db, "users", userCred.user.uid), {
+        vipLevel: 0,
+        balance: 0,
+        pendingVIP: 0
+      });
+    }
+
+    alert("Success!");
+    window.location.href = "index.html";
+
+  }catch(e){
+    alert(e.message);
+  }
+}
+
+// 🔥 Auto login
+onAuthStateChanged(auth, (user)=>{
+  if(user){
+    window.location.href = "index.html";
+  }
+});
+</script>
+
+</body>
+</html>
