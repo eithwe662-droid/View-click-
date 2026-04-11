@@ -1,83 +1,62 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Home</title>
-
+<title>View Click</title>
 <style>
-body{background:#111;color:white;font-family:Arial;margin:0}
-.video{margin:10px;padding:10px;background:#222;border-radius:10px}
+body{margin:0;background:#111;color:white;font-family:Arial}
+.header{padding:10px;background:#000;font-size:20px}
+.video{display:flex;padding:10px;border-bottom:1px solid #333}
+.thumb{width:120px;height:70px;background:#444;margin-right:10px}
+.title{font-size:14px}
 </style>
 </head>
 
 <body>
 
-<h2 style="text-align:center;">🎥 View Click</h2>
-<p style="text-align:center;">💰 Balance: <span id="bal">0</span></p>
+<div class="header">📺 View Click</div>
 
-<button onclick="logout()">Logout</button>
-
-<div id="videos"></div>
-
-<script>
-// 🔐 login check
-let uid = localStorage.getItem("uid");
-if(!uid){
-  alert("Login first!");
-  location.href="index.html";
-}
-</script>
+<div id="list"></div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
 import { getFirestore, collection, getDocs } 
 from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyA2lwztDpRpACuXirg7T_WbMLqscnNwCdc",
-  authDomain: "viewclick-bea4e.firebaseapp.com",
-  projectId: "viewclick-bea4e"
-};
+const app = initializeApp({
+  apiKey:"AIzaSyA...",
+  authDomain:"viewclick-bea4e.firebaseapp.com",
+  projectId:"viewclick-bea4e"
+});
 
-const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-let balance = 0;
-
-async function loadVideos(){
+async function load(){
   let snap = await getDocs(collection(db,"videos"));
+  let list = document.getElementById("list");
 
-  snap.forEach((doc)=>{
-    let data = doc.data();
+  snap.forEach(doc=>{
+    let d = doc.data();
 
     let div = document.createElement("div");
     div.className="video";
 
-    div.innerHTML = `
-      <video width="100%" controls onended="earn(this)">
-        <source src="${data.url}">
-      </video>
+    div.innerHTML=`
+      <div class="thumb"></div>
+      <div>
+        <div class="title">${d.title}</div>
+      </div>
     `;
 
-    document.getElementById("videos").appendChild(div);
+    div.onclick = ()=>{
+      localStorage.setItem("video", JSON.stringify(d));
+      location.href="watch.html";
+    }
+
+    list.appendChild(div);
   });
 }
 
-window.earn = function(v){
-  if(!v.dataset.done){
-    v.dataset.done=true;
-    balance+=100;
-    document.getElementById("bal").innerText=balance;
-    alert("+100 MMK");
-  }
-}
-
-window.logout = function(){
-  localStorage.removeItem("uid");
-  location.href="index.html";
-}
-
-loadVideos();
+load();
 </script>
 
 </body>
