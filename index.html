@@ -1,57 +1,109 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Home</title>
+  <title>Login - Earn App</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
-    body {
-      background: #0f2027;
-      color: white;
-      font-family: Arial;
-      text-align: center;
-      padding: 20px;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
     }
 
-    .card {
-      background: #203a43;
-      padding: 20px;
-      border-radius: 15px;
-      margin-top: 20px;
+    body {
+      height: 100vh;
+      background: linear-gradient(135deg, #141e30, #243b55);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .box {
+      width: 90%;
+      max-width: 360px;
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(15px);
+      border-radius: 20px;
+      padding: 25px;
+      text-align: center;
+      color: white;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+      animation: fadeIn 0.8s ease;
+    }
+
+    @keyframes fadeIn {
+      from {opacity:0; transform: translateY(30px);}
+      to {opacity:1; transform: translateY(0);}
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      font-size: 24px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+      font-size: 14px;
     }
 
     button {
-      padding: 12px;
-      margin-top: 10px;
       width: 100%;
+      padding: 12px;
+      margin-top: 15px;
       border-radius: 10px;
       border: none;
-      background: gold;
+      background: linear-gradient(45deg, gold, orange);
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    #msg {
+      margin-top: 10px;
+      font-size: 14px;
+    }
+
+    .switch {
+      margin-top: 15px;
+      font-size: 14px;
+      cursor: pointer;
+      opacity: 0.8;
     }
   </style>
 </head>
 
 <body>
 
-<h2>🏠 Home</h2>
+<div class="box">
+  <h2 id="title">🔐 Login</h2>
 
-<div id="app" style="display:none;">
-  <div class="card">
-    <h3 id="vip">VIP 0</h3>
-    <h1 id="balance">0 Ks</h1>
-  </div>
+  <input type="email" id="email" placeholder="Enter Email">
+  <input type="password" id="password" placeholder="Enter Password">
 
-  <div class="card">
-    <button onclick="earn()">🎥 Earn 100 Ks</button>
-    <button onclick="logout()">🚪 Logout</button>
-  </div>
+  <button onclick="login()">Login</button>
+
+  <div id="msg"></div>
+
+  <div class="switch" onclick="toggle()">Don't have account? Signup</div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
+// 🔥 Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyA2lwztDpRpACuXirg7T_WbMLqscnNwCdc",
   authDomain: "viewclick-bea4e.firebaseapp.com",
@@ -63,53 +115,59 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-let userData = {};
-let currentUser;
+let isLogin = true;
 
-// loading screen
-document.body.innerHTML += "<p id='loading'>⏳ Loading...</p>";
+// 🔁 Toggle Login / Signup
+window.toggle = function(){
+  isLogin = !isLogin;
 
-onAuthStateChanged(auth, async (user) => {
-  if(user){
-    currentUser = user;
-
-    const ref = doc(db,"users",user.uid);
-    let snap = await getDoc(ref);
-
-    if(!snap.exists()){
-      await setDoc(ref,{vipLevel:0,balance:0});
-      snap = await getDoc(ref);
-    }
-
-    userData = snap.data();
-
-    document.getElementById("vip").innerText = "VIP " + userData.vipLevel;
-    document.getElementById("balance").innerText = userData.balance + " Ks";
-
-    document.getElementById("loading").remove();
-    document.getElementById("app").style.display = "block";
-
-  } else {
-    setTimeout(()=>{
-      window.location.href = "login.html";
-    },1000);
-  }
-});
-
-window.earn = async function(){
-  userData.balance += 100;
-
-  await updateDoc(doc(db,"users",currentUser.uid), {
-    balance: userData.balance
-  });
-
-  document.getElementById("balance").innerText = userData.balance + " Ks";
+  document.getElementById("title").innerText = isLogin ? "🔐 Login" : "🆕 Signup";
+  document.querySelector("button").innerText = isLogin ? "Login" : "Signup";
+  document.querySelector(".switch").innerText =
+    isLogin ? "Don't have account? Signup" : "Already have account? Login";
 }
 
-window.logout = function(){
-  signOut(auth);
+// 🔐 Login / Signup
+window.login = async function(){
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const msg = document.getElementById("msg");
+
+  if(!email || !password){
+    msg.style.color = "yellow";
+    msg.innerText = "⚠️ Fill all fields";
+    return;
+  }
+
+  msg.style.color = "white";
+  msg.innerText = "⏳ Please wait...";
+
+  try{
+    if(isLogin){
+      await signInWithEmailAndPassword(auth, email, password);
+    } else {
+      const userCred = await createUserWithEmailAndPassword(auth, email, password);
+
+      await setDoc(doc(db,"users",userCred.user.uid), {
+        vipLevel: 0,
+        balance: 0
+      });
+    }
+
+    msg.style.color = "lightgreen";
+    msg.innerText = "✅ Success! Redirecting...";
+
+    setTimeout(()=>{
+      window.location.href = "home.html"; // 🔥 important
+    },1000);
+
+  }catch(e){
+    msg.style.color = "red";
+    msg.innerText = "❌ " + e.message;
+    console.log(e);
+  }
 }
 </script>
 
 </body>
-      </html>
+</html>
