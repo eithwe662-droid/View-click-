@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Admin Panel</title>
+<title>Admin</title>
 </head>
 
 <body style="text-align:center;font-family:Arial">
@@ -9,10 +9,24 @@
 <h2>👑 Admin Panel</h2>
 
 <input id="url" placeholder="Video URL"><br><br>
-<button onclick="upload()">Upload Video</button>
+<button onclick="upload()">Upload</button>
+
+<br><br>
+<button onclick="logout()">Logout</button>
 
 <h3>Videos</h3>
 <div id="list"></div>
+
+<script>
+// 🔐 protect admin
+const ADMIN_EMAIL = "admin@gmail.com";
+let email = localStorage.getItem("email");
+
+if(email !== ADMIN_EMAIL){
+  alert("Access Denied!");
+  location.href="index.html";
+}
+</script>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
@@ -22,8 +36,7 @@ from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 const firebaseConfig = {
   apiKey: "AIzaSyA2lwztDpRpACuXirg7T_WbMLqscnNwCdc",
   authDomain: "viewclick-bea4e.firebaseapp.com",
-  projectId: "viewclick-bea4e",
-  storageBucket: "viewclick-bea4e.appspot.com"
+  projectId: "viewclick-bea4e"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -32,33 +45,22 @@ const db = getFirestore(app);
 window.upload = async function(){
   let url = document.getElementById("url").value;
 
-  if(!url){
-    alert("Enter video URL");
-    return;
-  }
-
-  await addDoc(collection(db,"videos"),{
-    url:url
-  });
-
-  alert("✅ Uploaded!");
+  await addDoc(collection(db,"videos"),{url:url});
+  alert("Uploaded!");
   load();
 }
 
 async function load(){
   let snap = await getDocs(collection(db,"videos"));
   let list = document.getElementById("list");
-  list.innerHTML = "";
+  list.innerHTML="";
 
   snap.forEach((d)=>{
-    let data = d.data();
-
-    let div = document.createElement("div");
-    div.innerHTML = `
-      ${data.url}
-      <button onclick="del('${d.id}')">❌ Delete</button>
+    let div=document.createElement("div");
+    div.innerHTML=`
+      ${d.data().url}
+      <button onclick="del('${d.id}')">❌</button>
     `;
-
     list.appendChild(div);
   });
 }
@@ -66,6 +68,11 @@ async function load(){
 window.del = async function(id){
   await deleteDoc(doc(db,"videos",id));
   load();
+}
+
+window.logout = function(){
+  localStorage.removeItem("email");
+  location.href="index.html";
 }
 
 load();
