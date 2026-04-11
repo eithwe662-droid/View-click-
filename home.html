@@ -1,193 +1,86 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <html>
 <head>
-  <title>Earn App VIP</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>View Click Home</title>
 
-  <style>
-    body {
-      margin:0;
-      font-family:Arial;
-      background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
-      color:white;
-      text-align:center;
-    }
-
-    header {
-      padding:20px;
-      font-size:22px;
-      background:rgba(255,255,255,0.1);
-    }
-
-    #app { display:none; padding:20px; }
-
-    .card {
-      background:rgba(255,255,255,0.1);
-      padding:20px;
-      border-radius:15px;
-      margin-top:15px;
-    }
-
-    button {
-      width:100%;
-      padding:12px;
-      margin-top:10px;
-      border-radius:10px;
-      border:none;
-      background:gold;
-      font-weight:bold;
-    }
-
-    .vip-box {
-      background:rgba(0,0,0,0.3);
-      padding:10px;
-      border-radius:10px;
-      margin-top:10px;
-    }
-  </style>
+<style>
+body{margin:0;background:#111;color:white;font-family:Arial}
+.header{text-align:center;padding:10px;background:#1e1e1e}
+.video{margin:10px;padding:10px;background:#222;border-radius:10px}
+.nav{
+ position:fixed;bottom:0;width:100%;
+ display:flex;justify-content:space-around;
+ background:#1e1e1e;padding:10px;
+}
+</style>
 </head>
 
 <body>
 
-<header>💰 Earn App VIP</header>
+<div class="header">
+<h2>🎥 View Click</h2>
+<p>💰 Balance: <span id="bal">0</span></p>
+</div>
 
-<div id="loading">⏳ Loading...</div>
+<div id="videos"></div>
 
-<div id="app">
-
-  <!-- USER INFO -->
-  <div class="card">
-    <h2 id="balance">0 Ks</h2>
-    <p id="vip">VIP 0</p>
-  </div>
-
-  <!-- EARN -->
-  <div class="card">
-    <button onclick="earn()">🎥 Earn 100 Ks</button>
-  </div>
-
-  <!-- VIP BUY -->
-  <div class="card">
-    <h3>💎 VIP Buy</h3>
-
-    <div class="vip-box">
-      VIP 1 - 500 Ks
-      <button onclick="buyVIP(1,500)">Buy</button>
-    </div>
-
-    <div class="vip-box">
-      VIP 2 - 1500 Ks
-      <button onclick="buyVIP(2,1500)">Buy</button>
-    </div>
-
-    <div class="vip-box">
-      VIP 3 - 3000 Ks
-      <button onclick="buyVIP(3,3000)">Buy</button>
-    </div>
-
-  </div>
-
-  <!-- LOGOUT -->
-  <div class="card">
-    <button onclick="logout()">🚪 Logout</button>
-  </div>
-
+<div class="nav">
+<div>🏠 Home</div>
+<div onclick="location.href='admin.html'">👑 Admin</div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs } 
+from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyA2lwztDpRpACuXirg7T_WbMLqscnNwCdc",
   authDomain: "viewclick-bea4e.firebaseapp.com",
   projectId: "viewclick-bea4e",
-  appId: "1:462455920611:web:f9d55065198faf191cb2d6"
+  storageBucket: "viewclick-bea4e.appspot.com"
 };
 
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
 const db = getFirestore(app);
 
-let currentUser;
-let userData = {};
+let balance = localStorage.getItem("bal") || 0;
+document.getElementById("bal").innerText = balance;
 
-// 🔐 LOGIN CHECK
-onAuthStateChanged(auth, async (user) => {
+async function loadVideos(){
+  let snap = await getDocs(collection(db,"videos"));
 
-  if (!user) {
-    window.location.href = "index.html";
-    return;
-  }
+  snap.forEach((doc)=>{
+    let data = doc.data();
 
-  currentUser = user;
+    let div = document.createElement("div");
+    div.className="video";
 
-  const ref = doc(db, "users", user.uid);
-  let snap = await getDoc(ref);
+    div.innerHTML = `
+      <video width="100%" controls onended="earn(this)">
+        <source src="${data.url}">
+      </video>
+    `;
 
-  if (!snap.exists()) {
-    await setDoc(ref, { vipLevel:0, balance:0 });
-    snap = await getDoc(ref);
-  }
-
-  userData = snap.data();
-
-  document.getElementById("loading").style.display="none";
-  document.getElementById("app").style.display="block";
-
-  updateUI();
-});
-
-// 🔄 UI
-function updateUI(){
-  document.getElementById("balance").innerText = userData.balance + " Ks";
-  document.getElementById("vip").innerText = "VIP " + userData.vipLevel;
-}
-
-// 🎥 EARN
-window.earn = async function(){
-  let earnAmount = 100;
-
-  // VIP bonus
-  if(userData.vipLevel == 1) earnAmount = 200;
-  if(userData.vipLevel == 2) earnAmount = 400;
-  if(userData.vipLevel == 3) earnAmount = 800;
-
-  userData.balance += earnAmount;
-
-  await updateDoc(doc(db,"users",currentUser.uid),{
-    balance:userData.balance
+    document.getElementById("videos").appendChild(div);
   });
-
-  updateUI();
 }
 
-// 💎 BUY VIP
-window.buyVIP = async function(level,price){
+window.earn = function(v){
+  if(!v.dataset.done){
+    v.dataset.done = true;
+    balance = Number(balance) + 100;
 
-  if(userData.balance < price){
-    alert("Not enough balance!");
-    return;
+    document.getElementById("bal").innerText = balance;
+    localStorage.setItem("bal", balance);
+
+    alert("💰 +100 MMK Earned!");
   }
-
-  userData.balance -= price;
-  userData.vipLevel = level;
-
-  await updateDoc(doc(db,"users",currentUser.uid),{
-    balance:userData.balance,
-    vipLevel:level
-  });
-
-  alert("VIP " + level + " Activated!");
-  updateUI();
 }
 
-// 🚪 LOGOUT
-window.logout = function(){
-  signOut(auth);
-}
+loadVideos();
 </script>
 
 </body>
-  </html>
+</html>
