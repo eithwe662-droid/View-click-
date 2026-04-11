@@ -1,34 +1,23 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>View Click Home</title>
+<title>Home</title>
 
 <style>
-body{margin:0;background:#111;color:white;font-family:Arial}
-.header{text-align:center;padding:10px;background:#1e1e1e}
+body{background:#111;color:white;font-family:Arial;margin:0}
 .video{margin:10px;padding:10px;background:#222;border-radius:10px}
-.nav{
- position:fixed;bottom:0;width:100%;
- display:flex;justify-content:space-around;
- background:#1e1e1e;padding:10px;
-}
 </style>
 </head>
 
 <body>
 
-<div class="header">
-<h2>🎥 View Click</h2>
-<p>💰 Balance: <span id="bal">0</span></p>
-</div>
+<h2 style="text-align:center;">🎥 View Click</h2>
+<p style="text-align:center;">💰 Balance: <span id="bal">0</span></p>
+
+<button onclick="logout()">Logout</button>
 
 <div id="videos"></div>
-
-<div class="nav">
-<div>🏠 Home</div>
-<div onclick="location.href='admin.html'">👑 Admin</div>
-</div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
@@ -38,15 +27,13 @@ from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 const firebaseConfig = {
   apiKey: "AIzaSyA2lwztDpRpACuXirg7T_WbMLqscnNwCdc",
   authDomain: "viewclick-bea4e.firebaseapp.com",
-  projectId: "viewclick-bea4e",
-  storageBucket: "viewclick-bea4e.appspot.com"
+  projectId: "viewclick-bea4e"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-let balance = localStorage.getItem("bal") || 0;
-document.getElementById("bal").innerText = balance;
+let balance = 0;
 
 async function loadVideos(){
   let snap = await getDocs(collection(db,"videos"));
@@ -69,14 +56,16 @@ async function loadVideos(){
 
 window.earn = function(v){
   if(!v.dataset.done){
-    v.dataset.done = true;
-    balance = Number(balance) + 100;
-
-    document.getElementById("bal").innerText = balance;
-    localStorage.setItem("bal", balance);
-
-    alert("💰 +100 MMK Earned!");
+    v.dataset.done=true;
+    balance+=100;
+    document.getElementById("bal").innerText=balance;
+    alert("+100 MMK");
   }
+}
+
+window.logout = function(){
+  localStorage.removeItem("email");
+  location.href="index.html";
 }
 
 loadVideos();
