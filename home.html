@@ -1,20 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>View Click</title>
-<style>
-body{margin:0;background:#111;color:white;font-family:Arial}
-.header{padding:10px;background:#000;font-size:20px}
-.video{display:flex;padding:10px;border-bottom:1px solid #333}
-.thumb{width:120px;height:70px;background:#444;margin-right:10px}
-.title{font-size:14px}
-</style>
+<title>Home</title>
 </head>
 
-<body>
+<body style="background:#111;color:white;font-family:Arial">
 
-<div class="header">📺 View Click</div>
-
+<h2>📺 View Click</h2>
 <div id="list"></div>
 
 <script type="module">
@@ -22,12 +14,16 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/fireba
 import { getFirestore, collection, getDocs } 
 from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
-const app = initializeApp({
-  apiKey:"AIzaSyA...",
-  authDomain:"viewclick-bea4e.firebaseapp.com",
-  projectId:"viewclick-bea4e"
-});
+const firebaseConfig = {
+  apiKey: "AIzaSyA2lwztDpRpACuXirg7T_WbMLqscnNwCdc",
+  authDomain: "viewclick-bea4e.firebaseapp.com",
+  projectId: "viewclick-bea4e",
+  storageBucket: "viewclick-bea4e.appspot.com",
+  messagingSenderId: "462455920611",
+  appId: "1:462455920611:web:f9d55065198faf191cb2d6"
+};
 
+const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 async function load(){
@@ -38,13 +34,9 @@ async function load(){
     let d = doc.data();
 
     let div = document.createElement("div");
-    div.className="video";
-
+    div.style.margin="10px";
     div.innerHTML=`
-      <div class="thumb"></div>
-      <div>
-        <div class="title">${d.title}</div>
-      </div>
+      <p>${d.title}</p>
     `;
 
     div.onclick = ()=>{
