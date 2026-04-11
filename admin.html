@@ -2,23 +2,17 @@
 <html>
 <head>
 <title>Upload Video</title>
-<style>
-body{background:#111;color:white;text-align:center;font-family:Arial}
-input,button{margin:10px;padding:10px;border-radius:8px;border:none}
-button{background:red;color:white}
-</style>
 </head>
 
 <body>
 
-<h2>📤 Upload Video</h2>
-
-<input type="text" id="title" placeholder="Video Title"><br>
+<h2>Upload</h2>
+<input type="text" id="title" placeholder="Title"><br>
 <input type="file" id="file"><br>
 <button onclick="upload()">Upload</button>
 
 <script>
-// 🔐 admin protect
+// 🔐 Admin UID protect
 const ADMIN_UID = "kvtZvLkII8aOI9bcAV0169tDKAc2";
 if(localStorage.getItem("uid") !== ADMIN_UID){
   alert("No access");
@@ -33,13 +27,17 @@ from "https://www.gstatic.com/firebasejs/12.12.0/firebase-storage.js";
 import { getFirestore, collection, addDoc } 
 from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
-const app = initializeApp({
-  apiKey:"AIzaSyA...",
-  authDomain:"viewclick-bea4e.firebaseapp.com",
-  projectId:"viewclick-bea4e",
-  storageBucket:"viewclick-bea4e.appspot.com"
-});
+// ✅ FULL CONFIG (already added)
+const firebaseConfig = {
+  apiKey: "AIzaSyA2lwztDpRpACuXirg7T_WbMLqscnNwCdc",
+  authDomain: "viewclick-bea4e.firebaseapp.com",
+  projectId: "viewclick-bea4e",
+  storageBucket: "viewclick-bea4e.appspot.com",
+  messagingSenderId: "462455920611",
+  appId: "1:462455920611:web:f9d55065198faf191cb2d6"
+};
 
+const app = initializeApp(firebaseConfig);
 const storage = getStorage(app);
 const db = getFirestore(app);
 
@@ -52,15 +50,15 @@ window.upload = async function(){
     return;
   }
 
-  let refStorage = ref(storage,"videos/"+file.name);
-  await uploadBytes(refStorage,file);
+  let storageRef = ref(storage,"videos/"+file.name);
 
-  let url = await getDownloadURL(refStorage);
+  await uploadBytes(storageRef,file);
+
+  let url = await getDownloadURL(storageRef);
 
   await addDoc(collection(db,"videos"),{
     title:title,
-    url:url,
-    time:Date.now()
+    url:url
   });
 
   alert("Uploaded!");
