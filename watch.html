@@ -2,17 +2,12 @@
 <html>
 <head>
 <title>Watch</title>
-<style>
-body{background:#000;color:white;font-family:Arial;margin:0}
-video{width:100%}
-.title{padding:10px}
-</style>
 </head>
 
-<body>
+<body style="background:black;color:white">
 
-<video controls id="player"></video>
-<div class="title" id="title"></div>
+<video id="player" controls width="100%"></video>
+<h3 id="title"></h3>
 
 <script>
 let data = JSON.parse(localStorage.getItem("video"));
