@@ -1,157 +1,97 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Earn App </title>
+  <title>Earn App VIP</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', sans-serif;
-    }
-
     body {
-      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-      color: white;
+      margin:0;
+      font-family:Arial;
+      background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+      color:white;
+      text-align:center;
     }
 
     header {
-      text-align: center;
-      padding: 20px;
-      font-size: 22px;
-      font-weight: bold;
-      background: rgba(255,255,255,0.05);
-      backdrop-filter: blur(10px);
+      padding:20px;
+      font-size:22px;
+      background:rgba(255,255,255,0.1);
     }
 
-    .container {
-      padding: 15px;
-      padding-bottom: 80px;
-    }
+    #app { display:none; padding:20px; }
 
     .card {
-      background: rgba(255,255,255,0.08);
-      border-radius: 20px;
-      padding: 20px;
-      margin-bottom: 15px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+      background:rgba(255,255,255,0.1);
+      padding:20px;
+      border-radius:15px;
+      margin-top:15px;
     }
 
-    .balance {
-      font-size: 30px;
-      font-weight: bold;
-      color: gold;
+    button {
+      width:100%;
+      padding:12px;
+      margin-top:10px;
+      border-radius:10px;
+      border:none;
+      background:gold;
+      font-weight:bold;
     }
 
-    .vip {
-      opacity: 0.8;
-      margin-top: 5px;
-    }
-
-    .earn-btn {
-      width: 100%;
-      padding: 15px;
-      border-radius: 15px;
-      border: none;
-      background: linear-gradient(45deg, gold, orange);
-      font-size: 18px;
-      font-weight: bold;
-      margin-top: 15px;
-    }
-
-    .vip-card {
-      background: rgba(0,0,0,0.4);
-      padding: 15px;
-      border-radius: 15px;
-      margin-top: 10px;
-    }
-
-    input {
-      width: 100%;
-      padding: 12px;
-      border-radius: 10px;
-      border: none;
-      margin-top: 10px;
-    }
-
-    .nav {
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-      background: rgba(0,0,0,0.7);
-      display: flex;
-      justify-content: space-around;
-      padding: 10px;
-    }
-
-    .nav button {
-      background: none;
-      border: none;
-      color: white;
-      font-size: 16px;
-    }
-
-    #loading {
-      text-align: center;
-      margin-top: 50px;
+    .vip-box {
+      background:rgba(0,0,0,0.3);
+      padding:10px;
+      border-radius:10px;
+      margin-top:10px;
     }
   </style>
 </head>
 
 <body>
 
-<header>💰 Earn app </header>
+<header>💰 Earn App VIP</header>
 
 <div id="loading">⏳ Loading...</div>
 
-<div class="container" id="app" style="display:none;">
+<div id="app">
 
-  <!-- DASHBOARD -->
-  <div id="dashboard">
-    <div class="card">
-      <div class="balance" id="balance">0 Ks</div>
-      <div class="vip" id="vip">VIP 0</div>
-    </div>
-
-    <div class="card">
-      <button class="earn-btn" onclick="earn()">🎥 Watch & Earn (+100)</button>
-      <button class="earn-btn" onclick="logout()">🚪 Logout</button>
-    </div>
+  <!-- USER INFO -->
+  <div class="card">
+    <h2 id="balance">0 Ks</h2>
+    <p id="vip">VIP 0</p>
   </div>
 
-  <!-- VIP PAGE -->
-  <div id="vipPage" style="display:none;">
-    <div class="card">
-      <h2>💎 VIP Plans</h2>
-
-      <div class="vip-card">
-        VIP 1 - 5000 Ks  
-        <button onclick="buyVIP(1)">Buy</button>
-      </div>
-
-      <div class="vip-card">
-        VIP 2 - 15000 Ks  
-        <button onclick="buyVIP(2)">Buy</button>
-      </div>
-
-      <div class="vip-card">
-        VIP 3 - 30000 Ks  
-        <button onclick="buyVIP(3)">Buy</button>
-      </div>
-
-      <input id="proof" placeholder="Payment Screenshot Link">
-      <button class="earn-btn" onclick="submitPayment()">Submit</button>
-    </div>
+  <!-- EARN -->
+  <div class="card">
+    <button onclick="earn()">🎥 Earn 100 Ks</button>
   </div>
 
-</div>
+  <!-- VIP BUY -->
+  <div class="card">
+    <h3>💎 VIP Buy</h3>
 
-<!-- NAV -->
-<div class="nav">
-  <button onclick="show('dashboard')">🏠 Home</button>
-  <button onclick="show('vipPage')">💎 VIP</button>
+    <div class="vip-box">
+      VIP 1 - 500 Ks
+      <button onclick="buyVIP(1,500)">Buy</button>
+    </div>
+
+    <div class="vip-box">
+      VIP 2 - 1500 Ks
+      <button onclick="buyVIP(2,1500)">Buy</button>
+    </div>
+
+    <div class="vip-box">
+      VIP 3 - 3000 Ks
+      <button onclick="buyVIP(3,3000)">Buy</button>
+    </div>
+
+  </div>
+
+  <!-- LOGOUT -->
+  <div class="card">
+    <button onclick="logout()">🚪 Logout</button>
+  </div>
+
 </div>
 
 <script type="module">
@@ -172,48 +112,34 @@ const db = getFirestore(app);
 
 let currentUser;
 let userData = {};
-let selectedVIP = 0;
 
-// 🔥 SAFE AUTH LOAD
+// 🔐 LOGIN CHECK
 onAuthStateChanged(auth, async (user) => {
 
-  if(!user){
+  if (!user) {
     window.location.href = "index.html";
     return;
   }
 
   currentUser = user;
 
-  try{
-    const ref = doc(db,"users",user.uid);
-    let snap = await getDoc(ref);
+  const ref = doc(db, "users", user.uid);
+  let snap = await getDoc(ref);
 
-    // 🔥 create if not exist
-    if(!snap.exists()){
-      await setDoc(ref,{
-        vipLevel: 0,
-        balance: 0,
-        pendingVIP: 0
-      });
-      snap = await getDoc(ref);
-    }
-
-    userData = snap.data();
-
-    // ✅ SHOW UI
-    document.getElementById("loading").style.display = "none";
-    document.getElementById("app").style.display = "block";
-
-    updateUI();
-
-  }catch(e){
-    console.log(e);
-    alert("❌ Database error");
+  if (!snap.exists()) {
+    await setDoc(ref, { vipLevel:0, balance:0 });
+    snap = await getDoc(ref);
   }
 
+  userData = snap.data();
+
+  document.getElementById("loading").style.display="none";
+  document.getElementById("app").style.display="block";
+
+  updateUI();
 });
 
-// 🔄 UPDATE UI
+// 🔄 UI
 function updateUI(){
   document.getElementById("balance").innerText = userData.balance + " Ks";
   document.getElementById("vip").innerText = "VIP " + userData.vipLevel;
@@ -221,128 +147,47 @@ function updateUI(){
 
 // 🎥 EARN
 window.earn = async function(){
-  userData.balance += 100;
+  let earnAmount = 100;
+
+  // VIP bonus
+  if(userData.vipLevel == 1) earnAmount = 200;
+  if(userData.vipLevel == 2) earnAmount = 400;
+  if(userData.vipLevel == 3) earnAmount = 800;
+
+  userData.balance += earnAmount;
 
   await updateDoc(doc(db,"users",currentUser.uid),{
-    balance: userData.balance
+    balance:userData.balance
   });
 
   updateUI();
 }
 
-// 👑 VIP
-window.buyVIP = function(v){
-  selectedVIP = v;
-  alert("Selected VIP " + v);
-}
+// 💎 BUY VIP
+window.buyVIP = async function(level,price){
 
-// 💰 SUBMIT
-window.submitPayment = async function(){
-  const proof = document.getElementById("proof").value;
-
-  if(selectedVIP == 0){
-    alert("Select VIP first!");
+  if(userData.balance < price){
+    alert("Not enough balance!");
     return;
   }
 
-  await updateDoc(doc(db,"users",currentUser.uid),{
-    pendingVIP: selectedVIP,
-    paymentProof: proof
-  });
-
-  alert("Submitted!");
-}
-
-// 🚪 LOGOUT
-window.logout = function(){
-  signOut(auth);
-}
-
-// 📱 NAV
-window.show = function(page){
-  document.getElementById("dashboard").style.display = "none";
-  document.getElementById("vipPage").style.display = "none";
-  document.getElementById(page).style.display = "block";
-}
-
-// 🔐 AUTH CHECK
-onAuthStateChanged(auth, async (user) => {
-  if(user){
-    currentUser = user;
-
-    const ref = doc(db,"users",user.uid);
-    let snap = await getDoc(ref);
-
-    if(!snap.exists()){
-      await setDoc(ref,{vipLevel:0,balance:0});
-      snap = await getDoc(ref);
-    }
-
-    userData = snap.data();
-    updateUI();
-
-    document.getElementById("loading").style.display = "none";
-    document.getElementById("app").style.display = "block";
-
-  } else {
-    setTimeout(()=>{
-      window.location.href = "index.html";
-    },1000);
-  }
-});
-
-// 🔄 UI UPDATE
-function updateUI(){
-  document.getElementById("balance").innerText = userData.balance + " Ks";
-  document.getElementById("vip").innerText = "VIP " + userData.vipLevel;
-}
-
-// 🎥 EARN
-window.earn = async function(){
-  userData.balance += 100;
+  userData.balance -= price;
+  userData.vipLevel = level;
 
   await updateDoc(doc(db,"users",currentUser.uid),{
-    balance: userData.balance
+    balance:userData.balance,
+    vipLevel:level
   });
 
+  alert("VIP " + level + " Activated!");
   updateUI();
 }
 
-// 👑 BUY VIP
-window.buyVIP = function(v){
-  selectedVIP = v;
-  alert("Selected VIP " + v);
-}
-
-// 💰 SUBMIT PAYMENT
-window.submitPayment = async function(){
-  const proof = document.getElementById("proof").value;
-
-  if(selectedVIP == 0){
-    alert("Select VIP first!");
-    return;
-  }
-
-  await updateDoc(doc(db,"users",currentUser.uid),{
-    pendingVIP: selectedVIP,
-    paymentProof: proof
-  });
-
-  alert("Submitted! Wait admin approval");
-}
-
 // 🚪 LOGOUT
 window.logout = function(){
   signOut(auth);
-}
-
-// 📱 NAVIGATION
-window.show = function(page){
-  document.getElementById("dashboard").style.display = "none";
-  document.getElementById("vipPage").style.display = "none";
-  document.getElementById(page).style.display = "block";
 }
 </script>
 
 </body>
-</html>
+  </html>
