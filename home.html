@@ -102,7 +102,7 @@
 
 <body>
 
-<header>💰 Earn App Pro</header>
+<header>💰 Earn app </header>
 
 <div id="loading">⏳ Loading...</div>
 
@@ -170,9 +170,101 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-let userData = {};
 let currentUser;
+let userData = {};
 let selectedVIP = 0;
+
+// 🔥 SAFE AUTH LOAD
+onAuthStateChanged(auth, async (user) => {
+
+  if(!user){
+    window.location.href = "index.html";
+    return;
+  }
+
+  currentUser = user;
+
+  try{
+    const ref = doc(db,"users",user.uid);
+    let snap = await getDoc(ref);
+
+    // 🔥 create if not exist
+    if(!snap.exists()){
+      await setDoc(ref,{
+        vipLevel: 0,
+        balance: 0,
+        pendingVIP: 0
+      });
+      snap = await getDoc(ref);
+    }
+
+    userData = snap.data();
+
+    // ✅ SHOW UI
+    document.getElementById("loading").style.display = "none";
+    document.getElementById("app").style.display = "block";
+
+    updateUI();
+
+  }catch(e){
+    console.log(e);
+    alert("❌ Database error");
+  }
+
+});
+
+// 🔄 UPDATE UI
+function updateUI(){
+  document.getElementById("balance").innerText = userData.balance + " Ks";
+  document.getElementById("vip").innerText = "VIP " + userData.vipLevel;
+}
+
+// 🎥 EARN
+window.earn = async function(){
+  userData.balance += 100;
+
+  await updateDoc(doc(db,"users",currentUser.uid),{
+    balance: userData.balance
+  });
+
+  updateUI();
+}
+
+// 👑 VIP
+window.buyVIP = function(v){
+  selectedVIP = v;
+  alert("Selected VIP " + v);
+}
+
+// 💰 SUBMIT
+window.submitPayment = async function(){
+  const proof = document.getElementById("proof").value;
+
+  if(selectedVIP == 0){
+    alert("Select VIP first!");
+    return;
+  }
+
+  await updateDoc(doc(db,"users",currentUser.uid),{
+    pendingVIP: selectedVIP,
+    paymentProof: proof
+  });
+
+  alert("Submitted!");
+}
+
+// 🚪 LOGOUT
+window.logout = function(){
+  signOut(auth);
+}
+
+// 📱 NAV
+window.show = function(page){
+  document.getElementById("dashboard").style.display = "none";
+  document.getElementById("vipPage").style.display = "none";
+  document.getElementById(page).style.display = "block";
+}
+</script>
 
 // 🔐 AUTH CHECK
 onAuthStateChanged(auth, async (user) => {
