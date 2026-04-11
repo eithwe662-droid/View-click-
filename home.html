@@ -19,6 +19,15 @@ body{background:#111;color:white;font-family:Arial;margin:0}
 
 <div id="videos"></div>
 
+<script>
+// 🔐 login check
+let uid = localStorage.getItem("uid");
+if(!uid){
+  alert("Login first!");
+  location.href="index.html";
+}
+</script>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
 import { getFirestore, collection, getDocs } 
@@ -64,7 +73,7 @@ window.earn = function(v){
 }
 
 window.logout = function(){
-  localStorage.removeItem("email");
+  localStorage.removeItem("uid");
   location.href="index.html";
 }
 
