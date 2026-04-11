@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Login - View Click</title>
+  <title>View Click Login</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
@@ -43,7 +43,7 @@
 <button onclick="login()">Login</button>
 <div id="msg"></div>
 
-<p onclick="toggle()" style="cursor:pointer;">Switch</p>
+<p onclick="toggle()" style="cursor:pointer;">Switch Login/Signup</p>
 </div>
 
 <script type="module">
@@ -63,7 +63,9 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-const ADMIN_EMAIL = "kvtZvLkII8aOI9bcAV0169tDKAc2";
+// 👑 ADMIN UID
+const ADMIN_UID = "kvtZvLkII8aOI9bcAV0169tDKAc2";
+
 let isLogin = true;
 
 window.toggle = function(){
@@ -76,25 +78,29 @@ window.login = async function(){
   let password = document.getElementById("password").value;
 
   try{
-    if(isLogin){
-      await signInWithEmailAndPassword(auth,email,password);
-    }else{
-      let user = await createUserWithEmailAndPassword(auth,email,password);
+    let userCred;
 
-      await setDoc(doc(db,"users",user.user.uid),{
+    if(isLogin){
+      userCred = await signInWithEmailAndPassword(auth,email,password);
+    }else{
+      userCred = await createUserWithEmailAndPassword(auth,email,password);
+
+      await setDoc(doc(db,"users",userCred.user.uid),{
         balance:0,
         vip:0
       });
     }
 
-    // save email
-    localStorage.setItem("email", email);
+    let uid = userCred.user.uid;
 
-    // redirect
-    if(email === ADMIN_EMAIL){
-      location.href="admin.html";
+    // 🔐 save UID
+    localStorage.setItem("uid", uid);
+
+    // 🔁 redirect
+    if(uid === ADMIN_UID){
+      location.href = "admin.html";
     }else{
-      location.href="home.html";
+      location.href = "home.html";
     }
 
   }catch(e){
@@ -104,4 +110,4 @@ window.login = async function(){
 </script>
 
 </body>
-</html>
+  </html>
