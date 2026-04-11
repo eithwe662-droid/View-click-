@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Admin</title>
+<title>Admin Panel</title>
 </head>
 
 <body style="text-align:center;font-family:Arial">
@@ -18,11 +18,11 @@
 <div id="list"></div>
 
 <script>
-// 🔐 protect admin
-const ADMIN_EMAIL = "admin@gmail.com";
-let email = localStorage.getItem("email");
+// 🔐 ADMIN LOCK
+const ADMIN_UID = "kvtZvLkII8aOI9bcAV0169tDKAc2";
+let uid = localStorage.getItem("uid");
 
-if(email !== ADMIN_EMAIL){
+if(uid !== ADMIN_UID){
   alert("Access Denied!");
   location.href="index.html";
 }
@@ -71,7 +71,7 @@ window.del = async function(id){
 }
 
 window.logout = function(){
-  localStorage.removeItem("email");
+  localStorage.removeItem("uid");
   location.href="index.html";
 }
 
