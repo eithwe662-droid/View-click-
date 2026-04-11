@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Home</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      background: #0f2027;
+      color: white;
+      font-family: Arial;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .card {
+      background: #203a43;
+      padding: 20px;
+      border-radius: 15px;
+      margin-top: 20px;
+    }
+
+    button {
+      padding: 12px;
+      margin-top: 10px;
+      width: 100%;
+      border-radius: 10px;
+      border: none;
+      background: gold;
+    }
+  </style>
+</head>
+
+<body>
+
+<h2>🏠 Home</h2>
+
+<div id="app" style="display:none;">
+  <div class="card">
+    <h3 id="vip">VIP 0</h3>
+    <h1 id="balance">0 Ks</h1>
+  </div>
+
+  <div class="card">
+    <button onclick="earn()">🎥 Earn 100 Ks</button>
+    <button onclick="logout()">🚪 Logout</button>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA2lwztDpRpACuXirg7T_WbMLqscnNwCdc",
+  authDomain: "viewclick-bea4e.firebaseapp.com",
+  projectId: "viewclick-bea4e",
+  appId: "1:462455920611:web:f9d55065198faf191cb2d6"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let userData = {};
+let currentUser;
+
+// loading screen
+document.body.innerHTML += "<p id='loading'>⏳ Loading...</p>";
+
+onAuthStateChanged(auth, async (user) => {
+  if(user){
+    currentUser = user;
+
+    const ref = doc(db,"users",user.uid);
+    let snap = await getDoc(ref);
+
+    if(!snap.exists()){
+      await setDoc(ref,{vipLevel:0,balance:0});
+      snap = await getDoc(ref);
+    }
+
+    userData = snap.data();
+
+    document.getElementById("vip").innerText = "VIP " + userData.vipLevel;
+    document.getElementById("balance").innerText = userData.balance + " Ks";
+
+    document.getElementById("loading").remove();
+    document.getElementById("app").style.display = "block";
+
+  } else {
+    setTimeout(()=>{
+      window.location.href = "login.html";
+    },1000);
+  }
+});
+
+window.earn = async function(){
+  userData.balance += 100;
+
+  await updateDoc(doc(db,"users",currentUser.uid), {
+    balance: userData.balance
+  });
+
+  document.getElementById("balance").innerText = userData.balance + " Ks";
+}
+
+window.logout = function(){
+  signOut(auth);
+}
+</script>
+
+</body>
+      </html>
