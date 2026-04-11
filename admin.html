@@ -1,81 +1,70 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Admin Panel</title>
+<title>Upload Video</title>
+<style>
+body{background:#111;color:white;text-align:center;font-family:Arial}
+input,button{margin:10px;padding:10px;border-radius:8px;border:none}
+button{background:red;color:white}
+</style>
 </head>
 
-<body style="text-align:center;font-family:Arial">
+<body>
 
-<h2>👑 Admin Panel</h2>
+<h2>📤 Upload Video</h2>
 
-<input id="url" placeholder="Video URL"><br><br>
+<input type="text" id="title" placeholder="Video Title"><br>
+<input type="file" id="file"><br>
 <button onclick="upload()">Upload</button>
 
-<br><br>
-<button onclick="logout()">Logout</button>
-
-<h3>Videos</h3>
-<div id="list"></div>
-
 <script>
-// 🔐 ADMIN LOCK
+// 🔐 admin protect
 const ADMIN_UID = "kvtZvLkII8aOI9bcAV0169tDKAc2";
-let uid = localStorage.getItem("uid");
-
-if(uid !== ADMIN_UID){
-  alert("Access Denied!");
+if(localStorage.getItem("uid") !== ADMIN_UID){
+  alert("No access");
   location.href="index.html";
 }
 </script>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } 
+import { getStorage, ref, uploadBytes, getDownloadURL } 
+from "https://www.gstatic.com/firebasejs/12.12.0/firebase-storage.js";
+import { getFirestore, collection, addDoc } 
 from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyA2lwztDpRpACuXirg7T_WbMLqscnNwCdc",
-  authDomain: "viewclick-bea4e.firebaseapp.com",
-  projectId: "viewclick-bea4e"
-};
+const app = initializeApp({
+  apiKey:"AIzaSyA...",
+  authDomain:"viewclick-bea4e.firebaseapp.com",
+  projectId:"viewclick-bea4e",
+  storageBucket:"viewclick-bea4e.appspot.com"
+});
 
-const app = initializeApp(firebaseConfig);
+const storage = getStorage(app);
 const db = getFirestore(app);
 
 window.upload = async function(){
-  let url = document.getElementById("url").value;
+  let title = document.getElementById("title").value;
+  let file = document.getElementById("file").files[0];
 
-  await addDoc(collection(db,"videos"),{url:url});
-  alert("Uploaded!");
-  load();
-}
+  if(!file || !title){
+    alert("Fill all!");
+    return;
+  }
 
-async function load(){
-  let snap = await getDocs(collection(db,"videos"));
-  let list = document.getElementById("list");
-  list.innerHTML="";
+  let refStorage = ref(storage,"videos/"+file.name);
+  await uploadBytes(refStorage,file);
 
-  snap.forEach((d)=>{
-    let div=document.createElement("div");
-    div.innerHTML=`
-      ${d.data().url}
-      <button onclick="del('${d.id}')">❌</button>
-    `;
-    list.appendChild(div);
+  let url = await getDownloadURL(refStorage);
+
+  await addDoc(collection(db,"videos"),{
+    title:title,
+    url:url,
+    time:Date.now()
   });
-}
 
-window.del = async function(id){
-  await deleteDoc(doc(db,"videos",id));
-  load();
+  alert("Uploaded!");
 }
-
-window.logout = function(){
-  localStorage.removeItem("uid");
-  location.href="index.html";
-}
-
-load();
 </script>
 
 </body>
